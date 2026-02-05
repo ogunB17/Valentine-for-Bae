@@ -98,74 +98,74 @@
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
-        const { createApp, ref } = Vue; 
-        
-        createApp({
-            setup() {  
-                const currentGuiltMessage = ref("");
-                const messages = [
-                    "don't pick no now 🥺",
-                    "Baby pick yes",
-                    "think am well well",
-                    "abeg no click this one 🙏",
-                    "Wrong choice ❌",
-                    "Are you sure? 😥"
-                ]; 
+      const { createApp, ref } = Vue; 
 
-                function goToPage(pageId) {
-                    document.querySelectorAll('.page').forEach(p => p.classList.remove('page-active'));
-                    const target = document.getElementById(pageId);
-                    if (target) {
-                        target.classList.add('page-active');
-                    }
-                    window.scrollTo(0, 0);
-                }
+createApp({
+    setup() {  
+        const currentGuiltMessage = ref("");
+        const messages = [
+            "don't pick no now 🥺",
+            "Baby pick yes",
+            "think am well well",
+            "abeg no click this one 🙏",
+            "Wrong choice ❌",
+            "Are you sure? 😥"
+        ]; 
 
-                function handleYes() { 
-                    // Call your actual backend API
-                    fetch("/api/notify", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            action: "valentine_accepted",
-                            timestamp: new Date().toISOString()
-                        }),
-                    }).catch((err) => console.log("Notification failed:", err));
+        function goToPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('page-active'));
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('page-active');
+            window.scrollTo(0, 0);
+        }
 
-                    goToPage('page3');
-                }
+        async function handleYes() { 
+            // 1. Send the notification to your backend
+            try {
+                await fetch("/api/notify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    // Matching your backend's 'const { message } = req.body;'
+                    body: JSON.stringify({ 
+                        message: "🎉 SHE SAID YES! You have a Valentine! ❤️" 
+                    }),
+                });
+            } catch (err) {
+                console.error("Notification failed:", err);
+            }
 
-                function moveNo() {
-                    const btn = document.getElementById('no-button');
-                    
-                    const padding = 100;
-                    const maxX = window.innerWidth - btn.offsetWidth - padding;
-                    const maxY = window.innerHeight - btn.offsetHeight - padding;
-                    
-                    const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-                    const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-                    
-                    btn.style.position = 'fixed';
-                    btn.style.left = randomX + 'px';
-                    btn.style.top = randomY + 'px';
-                    
-                    // Update the reactive guilt message
-                    currentGuiltMessage.value = messages[Math.floor(Math.random() * messages.length)];
-                }
+            // 2. Move to the celebration page regardless of API speed
+            goToPage('page3');
+        }
 
-                function resetApp() {
-                    location.reload();
-                }
+        function moveNo() {
+            const btn = document.getElementById('no-button');
+            const padding = 100;
+            const maxX = window.innerWidth - btn.offsetWidth - padding;
+            const maxY = window.innerHeight - btn.offsetHeight - padding;
+            
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+            
+            btn.style.position = 'fixed';
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+            
+            currentGuiltMessage.value = messages[Math.floor(Math.random() * messages.length)];
+        }
 
-                return {
-                    currentGuiltMessage,
-                    goToPage, 
-                    handleYes, 
-                    moveNo,
-                    resetApp
-                }
-            },
-        }).mount("#app"); 
-    </script>
+        function resetApp() {
+            location.reload();
+        }
+
+        return {
+            currentGuiltMessage,
+            goToPage, 
+            handleYes, 
+            moveNo,
+            resetApp
+        }
+    },
+}).mount("#app"); </script>
 </body>
 </html>
